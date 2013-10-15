@@ -1,0 +1,17 @@
+<?php
+/**
+ * Implementation of hook_install.
+ */
+function appartments_install() {
+
+}
+
+
+/**
+ * Implementation of hook_uninstall.
+ */
+function appartments_uninstall() {
+  
+}
+
+

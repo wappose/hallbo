@@ -1,0 +1,12 @@
+name = Range field
+description = Provides numeric range field.
+package = Fields
+core = 7.x
+dependencies[] = field
+
+; Information added by drupal.org packaging script on 2013-02-11
+version = "7.x-1.0"
+core = "7.x"
+project = "range"
+datestamp = "1360578884"
+

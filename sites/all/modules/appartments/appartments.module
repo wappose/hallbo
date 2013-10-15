@@ -1,0 +1,71 @@
+<?php
+/**
+* @file
+* 
+*/
+
+
+/**
+* Implements hook_help.
+*
+* Displays help and module information.
+*
+* @param path
+* Which path of the site we're using to display help
+* @param arg
+* Array that holds the current path as returned from arg() function
+*
+*/
+function appartments_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#app4rent":
+      return '<p>'. t("this is it") .'</p>';
+      break;
+  }
+}
+
+
+
+function appartments_views_pre_view(&$view, &$display_id, &$args) {
+  
+/*   $filters = $view->display_handler->get_option('filters');
+   $filters['field_max_room_count_value']['value']['value'] = 4;
+   $filters['field_min_room_count_value']['value']['value'] = 4;
+   $view->display_handler->override_option('filters', $filters);
+   
+   if ($view->name === 'profils_k') {
+	  if (arg(0) == 'node' && is_numeric(arg(1))) {
+		$nid = arg(1);
+		$node = node_load($nid);
+	  }
+	  
+     //  $handler = $view->display['default']->handler;
+   }*/
+}
+
+
+function appartments_views_query_alter(&$view, &$query) {
+	
+	
+}
+
+function appartments_permission() {
+  return array(
+    'administer appartments' => array(
+      'title' => t('Administer appartmens module'),
+      'description' => t('Permission to administer apparments module.'),
+    ),
+  );
+}
+
+
+/*
+* Implements hook_email_registration_name() from module email_registration
+* just use email as username - allways
+*/
+function appartments_email_registration_name($edit, $account) { 
+	return $account->mail; 
+}
+
+
+

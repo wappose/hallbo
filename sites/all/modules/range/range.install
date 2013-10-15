@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the range field module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function range_field_schema($field) {
+  switch ($field['type']) {
+    case 'range_integer':
+      $column = array(
+        'type' => 'int',
+        'not null' => FALSE,
+      );
+      break;
+
+    case 'range_float':
+      $column = array(
+        'type' => 'float',
+        'not null' => FALSE,
+      );
+      break;
+
+    case 'range_decimal':
+      $column = array(
+        'type' => 'numeric',
+        'precision' => $field['settings']['precision'],
+        'scale' => $field['settings']['scale'],
+        'not null' => FALSE,
+      );
+      break;
+  }
+  $columns = array(
+    'from' => $column,
+    'to' => $column,
+  );
+  return array(
+    'columns' => $columns,
+  );
+}
