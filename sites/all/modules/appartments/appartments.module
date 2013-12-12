@@ -25,16 +25,12 @@ function appartments_help($path, $arg) {
 }
 
 function appartments_theme_registry_alter(&$theme_registry) {    
-	$theme_registry['views_view_field__appartments_waiting_list__page__created'] = array(
-      'template' => drupal_get_path('module', 'appartments').'/templates/views-view-field--appartments-waiting-list--page--created',
+	$theme_registry['views_view_field__page__created'] = array(
+      'template' => drupal_get_path('module', 'appartments').'/templates/views-view-field--page--created',
       'type' => 'module',
     );
-	$theme_registry['views_view_field__appartments_waiting_list__page__field_entry_date'] = array(
-      'template' => drupal_get_path('module', 'appartments').'/templates/views-view-field--appartments-waiting-list--page--field-entry-date',
-      'type' => 'module',
-    );
-	$theme_registry['views_view_field__appartments_waiting_list__page__field_start_date_test'] = array(
-      'template' => drupal_get_path('module', 'appartments').'/templates/views-view-field--appartments-waiting-list--page--field-start-date-test',
+	$theme_registry['views_view_field__page__field_entry_date'] = array(
+      'template' => drupal_get_path('module', 'appartments').'/templates/views-view-field--page--field-entry-date',
       'type' => 'module',
     );        
 }
@@ -78,6 +74,20 @@ function appartments_user_register_form($form, &$form_state){
         '#type' => 'textfield',
         '#required' => FALSE,
     );
+
+    $type_name = 'appartments_personal_information';
+    $profile_type = profile2_get_types($type_name);
+    
+    if (empty($form_state['profiles'][$type_name])) {
+      $form_state['profiles'][$type_name] = profile2_create(array('type' => $type_name));
+    }
+    profile2_attach_form($form, $form_state);
+    // Wrap each profile form in a fieldset.
+    $form['profile_' . $type_name] += array(
+      '#type' => 'fieldset',
+      '#title' => check_plain($profile_type->getTranslation('label')),
+    );
+    
     $form['submit'] = array(
         '#type' => 'submit',
         '#value' => t('Save'),
