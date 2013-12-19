@@ -40,6 +40,7 @@ function apartments_theme_registry_alter(&$theme_registry) {
 */
 function apartments_menu() {
   $items = array();
+
   $items['apartments/user/register'] = array(
     'title' => t('Registrera ny användare'),
     'page callback' => 'apartments_view_register_page',
@@ -52,7 +53,13 @@ function apartments_menu() {
     'page arguments' => array(2),
     'access arguments' => array('administer apartments'),
     'type' => MENU_NORMAL_ITEM,
-  );  
+  );
+  $items['apartments/user/fix'] = array(
+    'title' => t('Fixing stuff'),
+    'page callback' => 'apartments_fix_function',
+    'access arguments' => array('administer apartments'),
+    'type' => MENU_LOCAL_TASK,
+  );
   return $items;
 }
 
@@ -203,8 +210,9 @@ function apartments_user_form_submit_handler($form, &$form_state) {
     $u = user_save($form_state['#user'], $edit);
   }
   
+  //Not sure but this is overcompensating for profile2 that uses #user without hash (bug?)
   $form_state['user'] = $form_state['#user'] = $u;
-
+  
 	if($u) {
     if($register) {
   		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $values['name'], '!passwd' => $passwd)), 'status');	
@@ -293,3 +301,25 @@ function apartments_email_registration_name($edit, $account) {
 */
 
 
+function apartments_fix_function () {
+  echo "AKAKAKA";
+  $fp = fopen("/home/joos/Dokument/hallbo-import.csv", "r");
+  $first = true;
+  $i =0;
+  while (($row  = fgetcsv($fp))!==FALSE) {
+    if($first) {
+      $first = false;
+      continue;
+    }
+    $time = strtotime($row[0]);
+    if($u = user_load_by_name($row[7])) {
+      if($p = profile2_load_by_user($u, 'apartments_search_profile')) {
+        $i++;
+        $pwrapper = entity_metadata_wrapper('profile2', $p);
+        $pwrapper->field_entry_date->set($time);
+        $pwrapper->save();
+      }
+    }
+  }
+  echo $i;
+}
