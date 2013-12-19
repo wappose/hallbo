@@ -302,7 +302,6 @@ function apartments_email_registration_name($edit, $account) {
 
 
 function apartments_fix_function () {
-  echo "AKAKAKA";
   $fp = fopen("/home/joos/Dokument/hallbo-import.csv", "r");
   $first = true;
   $i =0;
