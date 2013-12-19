@@ -1,0 +1,8 @@
+name = Apartments module
+description = This module handles apartments
+core = 7.x
+
+dependencies[] = views
+dependencies[] = profile2
+dependencies[] = rules
+

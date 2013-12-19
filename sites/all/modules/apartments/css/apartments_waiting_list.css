@@ -1,0 +1,14 @@
+
+#views-exposed-form-apartments-queue-page #edit-field-rooms-requested-value-wrapper .bef-checkboxes .form-type-bef-checkbox {
+	float: left;
+	padding-right: 10px;
+}
+
+.field-name-field-rooms-requested .form-type-checkbox {
+	float: left;
+	padding-right: 10px;
+}
+.field-name-field-rooms-requested .form-checkboxes {
+	overflow:hidden;
+}
+

@@ -1,7 +1,0 @@
-name = Appartments module
-description = This module handles appartments and waiting list using submodules
-core = 7.x
-
-dependencies[] = views
-dependencies[] = profile2
-

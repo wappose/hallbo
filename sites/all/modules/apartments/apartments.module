@@ -1,0 +1,295 @@
+<?php
+/**
+* @file
+* 
+*/
+
+
+/**
+* Implements hook_help.
+*
+* Displays help and module information.
+*
+* @param path
+* Which path of the site we're using to display help
+* @param arg
+* Array that holds the current path as returned from arg() function
+* 
+*/
+function apartments_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#apartments":
+      return '<p>'. t("this is it") .'</p>';
+      break;
+  }
+}
+
+function apartments_theme_registry_alter(&$theme_registry) {    
+/*	$theme_registry['views_view_field__page__created'] = array(
+      'template' => drupal_get_path('module', 'apartments').'/templates/views-view-field--page--created',
+      'type' => 'module',
+    );*/
+	$theme_registry['views_view_field__page__field_entry_date'] = array(
+      'template' => drupal_get_path('module', 'apartments').'/templates/views-view-field--page--field-entry-date',
+      'type' => 'module',
+    );
+}
+
+/**
+* Implements hook_menu().
+*/
+function apartments_menu() {
+  $items = array();
+  $items['apartments/user/register'] = array(
+    'title' => t('Registrera ny användare'),
+    'page callback' => 'apartments_view_register_page',
+    'access arguments' => array('administer apartments'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['apartments/user/%/edit'] = array(
+    'title' => t('Redigera användare'),
+    'page callback' => 'apartments_view_account_page',
+    'page arguments' => array(2),
+    'access arguments' => array('administer apartments'),
+    'type' => MENU_NORMAL_ITEM,
+  );  
+  return $items;
+}
+
+function apartments_view_register_page () {
+  $form = drupal_get_form("apartments_user_register_form");
+
+	return theme('apartments_node', array('form' => $form));
+}
+function apartments_view_account_page ($uid) {
+  $user = user_load($uid);
+  $form = drupal_get_form("apartments_user_profile_form", $user);
+	return theme('apartments_node', array('form' => $form));
+}
+
+function apartments_theme() {
+        $theme = array();
+        $theme['apartments_node'] = array(
+                        'template' => 'templates/apartments-node',
+                        'arguments' => array(),
+        );
+        return $theme;
+}
+
+function apartments_user_profile_form($form, &$form_state) {
+  if(isset($form_state['build_info']['args'][0])) 
+    $form_state['#user'] = $form_state['build_info']['args'][0];
+
+  $form['name'] = array(
+    '#title' => t('Username'),
+    '#description' => t('Choose a username'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#value' => $form_state['#user']->name,
+  );
+  $form['mail'] = array(
+    '#title' => t('Email'),
+    '#description' => t('Enter a valid email address'),
+    '#type' => 'textfield',
+    '#required' => FALSE,
+    '#value' => $form_state['#user']->mail,
+  );
+  
+  $type_name = 'apartments_personal_information';
+  if (empty($form_state['profiles'])) {
+    $profile = profile2_load_by_user($form_state['#user'], $type_name);
+    if (empty($profile)) {
+      $profile = profile2_create(array('type' => $type_name, 'uid' => $form['#user']->uid));
+    }
+    $form_state['profiles'][$profile->type] = $profile;
+  }
+  profile2_attach_form($form, $form_state);
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#submit' => array('apartments_user_form_submit_handler', 'profile2_form_submit_handler'),
+    '#validate' => array('apartments_user_form_validate_handler', 'profile2_form_validate_handler'),
+  );
+  return $form;
+}
+
+function apartments_user_register_form($form, &$form_state) {
+//$admin = user_access('administer_users');
+  
+  $form['name'] = array(
+    '#title' => t('Username'),
+    '#description' => t('Choose a username'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  );
+  $form['mail'] = array(
+    '#title' => t('Email'),
+    '#description' => t('Enter a valid email address'),
+    '#type' => 'textfield',
+    '#required' => FALSE,
+  );
+
+  $type_name = 'apartments_personal_information';
+//  $profile_type = profile2_get_types($type_name);
+    
+  if (empty($form_state['profiles'][$type_name])) {
+    $form_state['profiles'][$type_name] = profile2_create(array('type' => $type_name));
+  }
+  profile2_attach_form($form, $form_state);
+  // Wrap each profile form in a fieldset.
+/*$form['profile_' . $type_name] += array(
+    '#type' => 'fieldset',
+    '#title' => check_plain($profile_type->getTranslation('label')),
+  );*/
+    
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#submit' => array('apartments_user_form_submit_handler', 'profile2_form_submit_handler'),
+    '#validate' => array('apartments_user_form_validate_handler', 'profile2_form_validate_handler'),
+  );
+  return $form;
+}
+
+function apartments_user_form_validate_handler($form, &$form_state) {
+  $values = empty($form_state['input']) ? $form_state['values'] : $form_state['input'];
+ 	if(empty($form_state['#user']))
+    $u = user_load_by_name($values['name']);
+  
+  //print_r($form_state['values']);
+	if($u && $u->uid) 
+		form_set_error('name', t('A user with specified username already exists'));
+	elseif($error_message = user_validate_name($values['name'])) 
+		form_set_error('name', $error_message);
+		
+	if(!empty($values['mail'])) {
+		if(valid_email_address($values['mail'])) {
+      if(empty($form_state['#user']) || $form_state['#user']->mail != $values['mail']) {
+			  $u = user_load_by_mail($values['mail']);
+			  if($u && $u->uid) 
+				  form_set_error('mail', t('A user with specified email address already exists'));
+      }
+		}
+		else
+			form_set_error('mail', t('The specified email address is invalid'));
+	}
+}
+
+function apartments_user_form_submit_handler($form, &$form_state) {
+  $values = empty($form_state['input']) ? $form_state['values'] : $form_state['input'];
+  $register = false;
+  if(empty($form_state['#user'])) {
+    $register = true;
+    $passwd = user_password();
+  	$edit = array(
+  		  'name' => $values['name'],
+  		  'pass' => $passwd,
+  		  'mail' => $values['mail'],
+  		  'init' => $values['mail'] ? $values['email'] : $values['name'],
+  		  'status' => 1,
+  		  'access' => REQUEST_TIME,
+  	);
+    $uu = drupal_anonymous_user();
+    $u = user_save($uu, $edit);
+  }
+  else {
+    $form_state['#user']->mail = $values['mail'];
+    $edit = array(
+      'name' => $values['name'],
+      'mail' => $values['mail'],
+      'status' => 1,
+      'access' => REQUEST_TIME,
+    );
+    $u = user_save($form_state['#user'], $edit);
+  }
+  
+  $form_state['user'] = $form_state['#user'] = $u;
+
+	if($u) {
+    if($register) {
+  		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $values['name'], '!passwd' => $passwd)), 'status');	
+      rules_invoke_event('apartments_user_register', $u);
+    }
+    else {
+      drupal_set_message(t('User with username "!name" has been updated', array('!name' => $values['name'])), 'status');  
+      rules_invoke_event('apartments_user_edit', $u);
+    }
+
+	}
+  else {
+    drupal_set_message(t('User with username "!name" could not be saved', array('!name' => $values['name'])), 'error');
+  }
+}
+
+function apartments_preprocess_page(&$vars, $hook) {
+  drupal_add_css(drupal_get_path('module', 'apartments') .'/css/apartments_waiting_list.css');
+}
+
+function apartments_views_pre_view(&$view, &$display_id, &$args) {
+  
+/*   $filters = $view->display_handler->get_option('filters');
+   $filters['field_max_room_count_value']['value']['value'] = 4;
+   $filters['field_min_room_count_value']['value']['value'] = 4;
+   $view->display_handler->override_option('filters', $filters);
+   
+   if ($view->name === 'profils_k') {
+	  if (arg(0) == 'node' && is_numeric(arg(1))) {
+		$nid = arg(1);
+		$node = node_load($nid);
+	  }
+	  
+     //  $handler = $view->display['default']->handler;
+   }*/
+}
+
+
+function apartments_views_query_alter(&$view, &$query) {
+	
+}
+
+function apartments_permission() {
+  return array(
+    'administer apartments' => array(
+      'title' => t('Administer apartmens module'),
+      'description' => t('Permission to administer apartments module.'),
+    ),
+  );
+}
+
+/**
+* Implementation of hook_rules_event_info().
+* @ingroup rules
+*/
+function apartments_rules_event_info() {
+  return array(
+    'apartments_user_edit' => array(
+      'label' => t('A user is updated using apartments module'),
+      'group' => 'Apartments',
+      'variables' => array(
+        'the_user' => array('type' => 'user', 
+                            'label' => t('The newly updated user object'),
+                            'description' => t('This is the userobject thats just been edited using the apartments module')),
+      ),
+    ),
+    'apartments_user_register' => array(
+      'label' => t('A user is registered using apartments module'),
+      'group' => 'Apartments',
+      'variables' => array(
+        'the_user' => array('type' => 'user', 
+                            'label' => t('The newly registered user object'),
+                            'description' => t('This is the userobject thats just been added using the apartments module')),
+      ),
+    ),
+  );
+}
+
+/*
+* Implements hook_email_registration_name() from module email_registration
+* just use email as username - allways
+
+function apartments_email_registration_name($edit, $account) { 
+	return $account->mail; 
+}
+*/
+
+

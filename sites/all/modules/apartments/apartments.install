@@ -2,15 +2,15 @@
 /**
  * Implementation of hook_install.
  */
-function appartments_install() {
-
+function apartments_install() {
+  
 }
 
 
 /**
  * Implementation of hook_uninstall.
  */
-function appartments_uninstall() {
+function apartments_uninstall() {
   
 }
 
