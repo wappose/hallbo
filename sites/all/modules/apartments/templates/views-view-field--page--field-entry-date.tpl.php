@@ -24,4 +24,3 @@
 
 $data = $row->field_field_entry_date[0]['raw']['value'];
 echo floor((time() - $data) / (3600*24));
-

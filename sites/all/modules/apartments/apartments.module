@@ -29,10 +29,10 @@ function apartments_theme_registry_alter(&$theme_registry) {
       'template' => drupal_get_path('module', 'apartments').'/templates/views-view-field--page--created',
       'type' => 'module',
     );*/
-	$theme_registry['views_view_field__page__field_entry_date'] = array(
+/*	$theme_registry['views_view_field__page__field_entry_date'] = array(
       'template' => drupal_get_path('module', 'apartments').'/templates/views-view-field--page--field-entry-date',
       'type' => 'module',
-    );
+    );*/
 }
 
 /**
@@ -300,6 +300,36 @@ function apartments_email_registration_name($edit, $account) {
 }
 */
 
+/**
+ * Implements hook_field_formatter_info().
+ */
+function apartments_field_formatter_info() {
+  $formatters = array(
+    'apartments_queue_points' => array(
+      'label' => t('Queue points'),
+      'description' => t('Queue points based on date of entry, one point per day'),
+      'field types' => array('date', 'datestamp', 'datetime'),
+    ),
+  );
+  return $formatters;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function apartments_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $elements = array();
+  switch ($display['type']) {
+    case 'apartments_queue_points':
+      foreach ($items as $delta => $item) {
+        $elements[$delta] = array(
+          '#markup' => floor((time() - $item['value']) / (3600*24)),
+        );
+      }
+      break;
+  }
+  return $elements;  
+}
 
 function apartments_fix_function () {
   $fp = fopen("/home/joos/Dokument/hallbo-import.csv", "r");
