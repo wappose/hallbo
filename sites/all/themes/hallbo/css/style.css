@@ -1,0 +1,91 @@
+/**
+ * This file should get overwritten if Method 1 is used. If Method 2 is chosen,
+ * remove this comment and start adding your styles to this file.
+ */
+
+/*body {
+
+}
+p, h1, h2, h3 {
+  font-family: none;
+}
+a {
+  color: #00a1e4;
+}
+
+header#navbar {
+  background-color: transparent;
+  border: 0;
+}
+header#navbar a.logo img {
+  border: 0;
+}
+header#navbar nav {
+  float: right; 
+  margin-top: 15px;
+}
+
+header#navbar .navbar-nav li > a {
+  font-family: none;
+  font-size: 24px;
+  padding: 10px 20px;
+  border-right: 1px solid #cccccc;
+} 
+header#navbar .navbar-nav li.last > a {
+  border-right: none;
+} 
+
+header#navbar .navbar-nav > .active > a, 
+header#navbar .navbar-nav > .active > a:hover, 
+header#navbar .navbar-nav > .active > a:focus {
+  background-color: transparent;
+  color: #222222;
+}
+
+@media (max-width: 767px) {
+  header#navbar nav {
+    float: none; 
+  }
+}
+
+.main-container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.footer {
+  background-color: #E5E5E5;
+  margin: 0;
+}
+
+*/
+
+
+header#navbar {
+  background-color: transparent;
+  border: 0;
+}
+header#navbar nav {
+  float: right; 
+  margin-top: 15px;
+  background-color: #019a61;
+}
+@media (max-width: 767px) {
+  header#navbar nav {
+    float: none; 
+  }
+}
+header#navbar .navbar-nav a {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+header#navbar .navbar-nav > .active > a, 
+header#navbar .navbar-nav > .active > a:hover, 
+header#navbar .navbar-nav > .active > a:focus {
+  background-color: transparent;
+
+}
+#block-block-1 {
+  float: right;
+}
