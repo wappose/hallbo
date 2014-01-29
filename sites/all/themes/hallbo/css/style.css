@@ -139,4 +139,4 @@ header#navbar .navbar-nav > .active > a:focus {
   margin: 0;
 }
 
-#block-block-1, #block-block-2 { float: right; }
+#block-block-1, #block-block-2 { float: right; padding-right: 20px; }
