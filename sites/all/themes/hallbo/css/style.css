@@ -87,3 +87,37 @@ header#navbar .navbar-nav > .active > a:focus {
 #block-block-1 {
   float: right;
 }
+
+.views-exposed-widgets .form-control {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  border-radius: none;
+  box-shadow: none;
+  color: inherit;
+  display: inherit;
+  font-size: inherit;
+  height: auto;
+  line-height: inherit;
+  padding: 0;
+  transition: none; ;
+  vertical-align: middle;
+  width: auto;
+}
+.views-exposed-widgets input.form-control {
+  display: inline;
+}
+
+.views-exposed-widgets ul {
+  margin-left: 0;
+  padding-left: 0;
+  list-style-type:none;
+}
+.views-exposed-widgets ul ul {
+  margin-left: 0;
+  padding-left: 15px;
+}
+.views-exposed-widgets label.option {
+  line-height: 20px;
+  font-weight: normal;
+}
