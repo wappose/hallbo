@@ -125,3 +125,16 @@ header#navbar .navbar-nav > .active > a:focus {
 #apartments-user-register-form .form-checkbox {
   max-width: inherit;
 }
+
+.view-apartments-queue fieldset.form-wrapper {
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+.view-apartments-queue legend.panel-heading {
+  display: none;
+}
+.view-apartments-queue .panel-body {
+  padding: 0;
+  margin: 0;
+}
