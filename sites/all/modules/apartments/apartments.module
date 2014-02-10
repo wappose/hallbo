@@ -51,6 +51,7 @@ function apartments_menu() {
     'title' => t('Redigera användare'),
     'page callback' => 'apartments_view_account_page',
     'page arguments' => array(2),
+    'access arguments' => array(2),
     'access callback' =>'apartments_user_edit_access',
     'type' => MENU_NORMAL_ITEM,
   ); 
@@ -220,10 +221,8 @@ function apartments_user_form_submit_handler($form, &$form_state) {
       
       global $user;
       $user = user_load($u->uid);
-
       $login_array = array ('name' => $values['name']);
       user_login_finalize($login_array);
-
     }
   }
   else {
@@ -241,9 +240,9 @@ function apartments_user_form_submit_handler($form, &$form_state) {
   $form_state['user'] = $form_state['#user'] = $u;
   
 	if($u) {
-    if($register) {
+    if($register && user_access('administer apartments module')) {
   		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $values['name'], '!passwd' => $passwd)), 'status');	
-      rules_invoke_event('apartments_user_register', $u);
+      rules_invoke_event('apartments_user_register', $u, $passwd);
     }
     else {
       drupal_set_message(t('User with username "!name" has been updated', array('!name' => $values['name'])), 'status');  
@@ -306,7 +305,10 @@ function apartments_user_register_access() {
   return (user_is_anonymous() && user_access('apartments create new account')) || user_access('administer apartments');
 }
 function apartments_user_edit_access($uid) {
-  return (!user_is_anonymous() && ((user_access('apartments edit own account') && $_GLOBAL['user']->uid == $uid) || user_access('apartments edit any account'))) || user_access('administer apartments');
+  global $user;
+  return (!user_is_anonymous() && 
+          ((user_access('apartments edit own account') && $user->uid == $uid) || user_access('apartments edit any account'))) || 
+        user_access('administer apartments');
 }
 
 /**
@@ -320,8 +322,9 @@ function apartments_rules_event_info() {
       'group' => 'Apartments',
       'variables' => array(
         'the_user' => array('type' => 'user', 
-                            'label' => t('The newly updated user object'),
-                            'description' => t('This is the userobject thats just been edited using the apartments module')),
+          'label' => t('The newly updated user object'),
+          'description' => t('This is the userobject thats just been edited using the apartments module')
+        ),
       ),
     ),
     'apartments_user_register' => array(
@@ -329,8 +332,13 @@ function apartments_rules_event_info() {
       'group' => 'Apartments',
       'variables' => array(
         'the_user' => array('type' => 'user', 
-                            'label' => t('The newly registered user object'),
-                            'description' => t('This is the userobject thats just been added using the apartments module')),
+          'label' => t('The newly registered user object'),
+          'description' => t('This is the userobject thats just been added using the apartments module')
+        ),
+        'user_password' => array('type' => 'text', 
+          'label' => t('The password of the newly created user object'),
+          'description' => t('This is the password (in clear text) of the userobject thats just been added using the apartments module')
+        ),
       ),
     ),
   );
