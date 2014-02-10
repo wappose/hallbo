@@ -77,7 +77,7 @@
   <div class="row">
     <div class="navbar-header">
       <?php if ($logo): ?>
-      <a class="logo pull-left" href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>">
+      <a class="logo navbar-btn pull-left" href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>">
         <img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" />
       </a>
       <?php endif; ?>
@@ -95,18 +95,23 @@
       </button>
     </div>
 
-    <?php if (!empty($primary_nav)): ?>
+    <?php if (!empty($primary_nav) || !empty($secondary_nav) || !empty($page['navigation'])): ?>
       <div class="navbar-collapse collapse">
         <nav role="navigation">
           <?php if (!empty($primary_nav)): ?>
             <?php print render($primary_nav); ?>
+          <?php endif; ?>
+          <?php if (!empty($secondary_nav)): ?>
+            <?php print render($secondary_nav); ?>
+          <?php endif; ?>
+          <?php if (!empty($page['navigation'])): ?>
+            <?php print render($page['navigation']); ?>
           <?php endif; ?>
         </nav>
       </div>
     <?php endif; ?>
   </div>
 </header>
-
 
 <div class="main-container container">
 
@@ -140,7 +145,7 @@
       <?php print $messages; ?>
       <?php if (!empty($tabs)): ?>
         <?php print render($tabs); ?>
-        <?php endif; ?>
+      <?php endif; ?>
       <?php if (!empty($page['help'])): ?>
         <?php print render($page['help']); ?>
       <?php endif; ?>
@@ -158,8 +163,6 @@
 
   </div>
 </div>
-<footer class="footer">
-  <div class="container">
-    <?php print render($page['footer']); ?>
-  </div>
+<footer class="footer container">
+  <?php print render($page['footer']); ?>
 </footer>

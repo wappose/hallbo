@@ -59,6 +59,18 @@ header#navbar .navbar-nav > .active > a:focus {
 }
 */
 
+/* reset some strange css in overrides.css in basetheme */
+@media screen and (min-width:768px) {
+  .navbar.container{max-width:750px}
+}
+@media screen and (min-width:992px){
+  .navbar.container{max-width:970px}
+}
+@media screen and (min-width:1200px){
+  .navbar.container{max-width:1190px}
+}
+/* end reset */
+
 header#navbar {
   background-color: transparent;
   border: 0;
