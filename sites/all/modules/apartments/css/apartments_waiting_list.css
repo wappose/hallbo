@@ -11,4 +11,12 @@
 .field-name-field-rooms-requested .form-checkboxes {
 	overflow:hidden;
 }
-
+.field-name-field-rooms-requested .checkbox+.checkbox {
+  margin-top: 0px;
+}
+.no-term-reference-tree-button {
+  background-color: transparent;
+}
+.term-reference-tree-button, .no-term-reference-tree-button {
+  margin-right: 25px;
+}
