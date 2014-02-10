@@ -240,8 +240,9 @@ function apartments_user_form_submit_handler($form, &$form_state) {
   $form_state['user'] = $form_state['#user'] = $u;
   
 	if($u) {
-    if($register && user_access('administer apartments module')) {
-  		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $values['name'], '!passwd' => $passwd)), 'status');	
+    if($register) {
+      if(user_access('administer apartments module'))
+    		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $values['name'], '!passwd' => $passwd)), 'status');	
       rules_invoke_event('apartments_user_register', $u, $passwd);
     }
     else {
