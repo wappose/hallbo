@@ -152,3 +152,30 @@ header#navbar .navbar-nav > .active > a:focus {
 }
 
 #block-block-1, #block-block-2 { float: right; padding-right: 20px; }
+
+#views-exposed-form-apartments-queue-page #edit-field-rooms-requested-value-wrapper .bef-checkboxes .form-type-bef-checkbox {
+  float: left;
+  padding-right: 10px;
+}
+
+
+.field-name-field-rooms-requested .form-type-checkbox,
+.field-name-field-apartments-options .form-type-checkbox,
+.field-name-field-apartments-objects .form-type-checkbox {
+  float: left;
+  padding-right: 10px;
+}
+.field-name-field-rooms-requested .form-checkboxes,
+.field-name-field-apartments-options .form-checkboxes,
+.field-name-field-apartments-objects  .form-checkboxes {
+  overflow:hidden;
+}
+.field-name-field-rooms-requested .checkbox+.checkbox,
+.field-name-field-apartments-options .checkbox+.checkbox,
+.field-name-field-apartments-objects .checkbox+.checkbox {
+  margin-top: 0px;
+}
+
+.field-name-field-specifics .tabledrag-toggle-weight-wrapper {
+  display: none;
+}
