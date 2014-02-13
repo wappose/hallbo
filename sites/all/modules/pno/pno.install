@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Implements hook_field_schema().
+ */
+function pno_field_schema($field) { 
+  // Return array that contains.
+  return array(                 
+    'columns' => array(          
+      'pno' => array(         
+        'type' => 'text',
+      ),
+    ),
+  );
+}

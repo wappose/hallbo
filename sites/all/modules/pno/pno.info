@@ -1,0 +1,6 @@
+name = Personnummer Field
+description = A Simple Text Field for Personnummer data
+package = fields  
+core = 7.x
+files[] = pno.module  
+files[] = pno.install

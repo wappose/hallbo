@@ -1,0 +1,142 @@
+<?php
+/**
+* Credits to the following pages: 
+* Stubs from this page
+* http://internetdevels.com/blog/module-with-field-api-drupal-7
+* Glue and paint from this page
+* http://evolvingweb.ca/story/poutine-maker-introduction-field-api-drupal-7-part-1
+* Happy reading.
+*/
+function pno_field_info() { 
+  // Returning array.
+  return array( 
+    // Which is called pno.
+    'pno' => array( 
+      // Name of our type will be 'Te(x/s)t field'.
+      'label' => t('Person number field'), 
+      // Description of our type.
+      'description' => t('A simple text field with person number validation'), 
+      // Standart widget that will be dispalyed at once.
+      // after that we choose field type
+      'default_widget' => 'pno_widget',                       
+      // Standart that will be dispayed right after we choose field type.
+      'default_formatter' => 'pno_formatter', 
+    ),
+  );
+}
+   
+/**
+ * Implements hook_field_widget_info().
+ */
+function pno_field_widget_info() { 
+  // Returning massive.
+  return array(  
+    // With pno name.
+    'pno_widget' => array( 
+      // Our widget will be named pno label.
+      'label' => t('Person number'), 
+      // Our widget will work with a field in DB under the name pno.
+      'field types' => array('pno'), 
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function pno_field_formatter_info() { 
+  // Returning array.
+  return array(  
+    // Name of our format for code.
+    'pno_formatter' => array( 
+      // Dispalyed name of format.
+      'label' => t('Pno text field formatter'), 
+      // Field in DB with which our format will work.
+      'field types' => array('pno'), 
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function pno_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  // Setting switch into parameters that wll work widget types that are in module.
+  switch ($instance['widget']['type']) { 
+    // If parameter case is 'textf'.
+    case 'pno': 
+      // Then we assign to textf element an array.
+      // With the following values.
+      $item =& $items[$delta];
+      $element['pno'] = array( 
+        // Element type 'textfield'.
+        '#type' => 'textfield', 
+        // Heading given in element settings.
+        '#title' => $element['#title'], 
+        // Widget description is given in element settings.
+        '#description' => $element['#description'],
+        // Our widget will have standart value textfield.
+        '#default_value' => isset($item['pno']) ? $item['pno'] : '',
+        // If element is required it will be indicated in settings of the very element.
+        '#required' => $element['#required'], 
+        // Element location – 
+        // If it's indicated, value should be used, if not, value is 0.
+        '#weight' => isset($element['#weight']) ? $element['#weight'] : 0,
+        // Line that we'll need for the output.
+        '#delta' => $delta, 
+      );
+    break;
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function pno_field_is_empty($item, $field) {
+  // If there's nothing in $item['textf'].
+  if (empty($item['pno'])) {
+    // Then we return 1, i.e. we say to Drupal that everything is fine).
+    return TRUE; 
+    // And if it's empty, nothing will be displayed.
+  }
+}
+
+function pno_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  foreach ($items as $delta => $item) {
+    if(strlen($item['pno']) > 0) {
+      $item['pno'] = preg_replace("/[^0-9]/", '', $item['pno']);
+      if (strlen($item['pno']) != 10) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'pno_invalid_checksum',
+          'message' => t('%title: the number must be 10 digits. ',
+            array('%title' => $instance['label'])
+          ),
+        );
+      }
+      else {
+       $n = 2;
+       for ($i=0; $i<9; $i++) { 
+        $tmp = $pnr[$i] * $n; 
+        ($tmp > 9) ? $sum += 1 + ($tmp % 10) : $sum += $tmp; ($n == 2) ? $n = 1 : $n = 2; 
+       }
+       if(($sum + $pnr[9]) % 10) 
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'pno_invalid_checksum',
+          'message' => t('%title: the number is invalid. ',
+            array('%title' => $instance['label'])
+          ),
+        );
+      }
+    }
+  }
+}
+
+function pno_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    // Handle the error that was set in pno_field_validate
+    case 'pno_invalid_checksum':
+      form_error($element, $error['message']);
+      break;
+  }
+}
