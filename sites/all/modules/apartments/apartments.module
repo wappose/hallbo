@@ -163,6 +163,8 @@ function apartments_user_register_form($form, &$form_state) {
 }
 
 function apartments_user_form_validate_handler($form, &$form_state) {
+//  $entity_type = 'profile2';
+//  profile2_form_submit_handler($entity_type, $form, $form_state);
   $values = empty($form_state['input']) ? $form_state['values'] : $form_state['input'];
  	if(empty($form_state['#user']))
     $u = user_load_by_name($values['name']);
@@ -173,7 +175,7 @@ function apartments_user_form_validate_handler($form, &$form_state) {
 	elseif($error_message = user_validate_name($values['name'])) 
 		form_set_error('name', $error_message);
 
-	if(!empty($values['mail'])) {
+  if(!empty($values['mail'])) {
 		if(valid_email_address($values['mail'])) {
       if(empty($form_state['#user']) || $form_state['#user']->mail != $values['mail']) {
 			  $u = user_load_by_mail($values['mail']);
@@ -184,6 +186,32 @@ function apartments_user_form_validate_handler($form, &$form_state) {
 		else
 			form_set_error('mail', t('The specified email address is invalid'));
 	}
+/*
+  if(!empty($values['profile_apartments_personal_information']['field_pno']['und'][0]['value'])) {
+    $perNum = preg_replace("/[^0-9]/", '', $values['profile_apartments_personal_information']['field_pno']['und'][0]['value']); //ta bort icke-siffror
+    if (strlen($perNum) == 12) //Tar bort århundrade
+      $perNum = substr($perNum, 2);
+    if (strlen($perNum) == 10) {//Om det inte är 10 siffror långt = fel
+      $tmp = "";
+      $n = 1;
+      for ($i = 0; $i < 9; $i++) {
+        ($n == 1) ? $n= 2 : $n = 1;
+        $tmp .= $n * $perNum[$i];
+      }
+      $tmp = str_split($tmp);
+      $sum = array_sum($tmp);
+      $check = (ceil($sum/10)-$sum/10)*10;
+      $ref = $perNum[9];
+//      echo gettype($check)." ".$check." = ".gettype($ref)." ".$ref;
+
+      if ($ref != $check) 
+        form_set_error('field_pno', t('Invalid pno'));
+    }
+    else { 
+      form_set_error('field_pno', t('Invalid pno'));
+    }
+  } */
+
 }
 
 function apartments_user_form_submit_handler($form, &$form_state) {
