@@ -1,4 +1,4 @@
-name = Personnummer Field
+name = Personnumber Field
 description = A Simple Text Field for Personnummer data
 package = fields  
 core = 7.x
