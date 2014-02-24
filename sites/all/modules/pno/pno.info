@@ -2,6 +2,5 @@ name = Personnumber Field
 description = A Simple Text Field for Personnummer data
 package = fields  
 core = 7.x
-dependencies[] = fapi_validation
 files[] = pno.module  
 files[] = pno.install

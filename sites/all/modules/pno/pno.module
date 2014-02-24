@@ -90,28 +90,12 @@ function pno_field_widget_form(&$form, &$form_state, $field, $instance, $langcod
         '#weight' => isset($element['#weight']) ? $element['#weight'] : 0,
         // Line that we'll need for the output.
         '#delta' => $delta, 
-        '#filters' => array('sanitize_pno'),
       );
     break;
   }
   return $element;
 }
 
-/**
-* Implementation of hook_fapi_validation_filters
-*/
-function pno_fapi_validation_filters() {
-  return array(
-    'sanitize_pno' => array(
-      'callback' => 'pno_sanitize_pno_filter',
-    ),
-  );
-}
-
-function pno_sanitize_pno_filter($value) {
-  _pno_sanitize_validate_data($value);
-  return $value;
-}
 /**
  * Implements hook_field_is_empty().
  */
