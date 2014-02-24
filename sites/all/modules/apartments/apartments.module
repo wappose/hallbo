@@ -55,6 +55,14 @@ function apartments_menu() {
     'access callback' =>'apartments_user_edit_access',
     'type' => MENU_NORMAL_ITEM,
   ); 
+  $items['admin/config/content/apartments'] = array(
+    'title' => t('Apartments module'),
+    'description' => t('Configuration of the apartments module'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('apartments_settings_form'),
+    'access arguments' => array('administer apartments'),
+    'type' => MENU_NORMAL_ITEM,
+  );
   $items['apartments/user/fix'] = array(
     'title' => t('Fixing stuff'),
     'page callback' => 'apartments_fix_function',
@@ -88,20 +96,26 @@ function apartments_user_profile_form($form, &$form_state) {
   if(isset($form_state['build_info']['args'][0])) 
     $form_state['#user'] = $form_state['build_info']['args'][0];
 
-  $form['name'] = array(
-    '#title' => t('Username'),
-    '#description' => t('Choose a username'),
-    '#type' => 'textfield',
-    '#required' => TRUE,
-    '#value' => $form_state['#user']->name,
-  );
-  $form['mail'] = array(
-    '#title' => t('Email'),
-    '#description' => t('Enter a valid email address'),
-    '#type' => 'textfield',
-    '#required' => FALSE,
-    '#value' => $form_state['#user']->mail,
-  ); 
+  $user_path = variable_get('apartments_path_username', '');
+  $email_path = variable_get('apartments_path_email', '');
+  if(empty($user_path)) {
+    $form['name'] = array(
+      '#title' => t('Username'),
+      '#description' => t('Choose a username'),
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#value' => $form_state['#user']->name,
+    );
+  }
+  if(empty($email_path)) {
+    $form['mail'] = array(
+      '#title' => t('Email'),
+      '#description' => t('Enter a valid email address'),
+      '#type' => 'textfield',
+      '#required' => FALSE,
+      '#value' => $form_state['#user']->mail,
+    ); 
+  }
   
   if (empty($form_state['profiles'])) {
     $types = profile2_get_types();
@@ -130,19 +144,24 @@ function apartments_user_profile_form($form, &$form_state) {
 
 function apartments_user_register_form($form, &$form_state) {
 //$admin = user_access('administer_users');
-  
-  $form['name'] = array(
-    '#title' => t('Username'),
-    '#description' => t('Choose a username'),
-    '#type' => 'textfield',
-    '#required' => TRUE,
-  );
-  $form['mail'] = array(
-    '#title' => t('Email'),
-    '#description' => t('Enter a valid email address'),
-    '#type' => 'textfield',
-    '#required' => FALSE,
-  ); 
+  $user_path = variable_get('apartments_path_username', '');
+  $email_path = variable_get('apartments_path_email', '');
+  if(empty($user_path)) {
+    $form['name'] = array(
+      '#title' => t('Username'),
+      '#description' => t('Choose a username'),
+      '#type' => 'textfield',
+      '#required' => TRUE,
+    );
+  }
+  if(empty($email_path)) {
+    $form['mail'] = array(
+      '#title' => t('Email'),
+      '#description' => t('Enter a valid email address'),
+      '#type' => 'textfield',
+      '#required' => FALSE,
+    ); 
+  }
 
   $types = profile2_get_types();
   foreach($types as $type) {
@@ -164,65 +183,53 @@ function apartments_user_register_form($form, &$form_state) {
 
 function apartments_user_form_validate_handler($form, &$form_state) {
   $values = empty($form_state['input']) ? $form_state['values'] : $form_state['input'];
- 	if(empty($form_state['#user']))
-    $u = user_load_by_name($values['name']);
-  
-  //print_r($form_state['values']);
-	if($u && $u->uid) 
-		form_set_error('name', t('A user with specified username already exists'));
-	elseif($error_message = user_validate_name($values['name'])) 
-		form_set_error('name', $error_message);
+  $user_path = variable_get('apartments_path_username', '');
+  list($username, $user_field, $user_profile)  = _apartments_get_data_from_form($values, $user_path, $values['name']);
 
-  if(!empty($values['mail'])) {
-		if(valid_email_address($values['mail'])) {
-      if(empty($form_state['#user']) || $form_state['#user']->mail != $values['mail']) {
-			  $u = user_load_by_mail($values['mail']);
+  $email_path = variable_get('apartments_path_email', '');
+  list($email, $email_field, $email_profile)  = _apartments_get_data_from_form($values, $email_path, $values['mail']);
+
+ 	if(empty($form_state['#user'])) {
+    $u = user_load_by_name($username);
+  }
+  
+  //TODO: make form set error mark profile2 fields in case of an error.
+	if($u && $u->uid) 
+		form_set_error($user_field ? $user_field : 'name', t('A user with specified username already exists'));
+	elseif($error_message = user_validate_name($username)) 
+		form_set_error($user_field ? $user_field : 'name', $error_message);
+
+  if(!empty($email)) {
+		if(valid_email_address($email)) {
+      if(empty($form_state['#user']) || $form_state['#user']->mail != $email) {
+			  $u = user_load_by_mail($email);
 			  if($u && $u->uid) 
-				  form_set_error('mail', t('A user with specified email address already exists'));
+				  form_set_error($email_field ? $email_field : 'mail', t('A user with specified email address already exists'));
       }
 		}
 		else
-			form_set_error('mail', t('The specified email address is invalid'));
+			form_set_error($email_field ? $email_field : 'mail', t('The specified email address is invalid'));
 	}
-/*
-  if(!empty($values['profile_apartments_personal_information']['field_pno']['und'][0]['value'])) {
-    $perNum = preg_replace("/[^0-9]/", '', $values['profile_apartments_personal_information']['field_pno']['und'][0]['value']); //ta bort icke-siffror
-    if (strlen($perNum) == 12) //Tar bort århundrade
-      $perNum = substr($perNum, 2);
-    if (strlen($perNum) == 10) {//Om det inte är 10 siffror långt = fel
-      $tmp = "";
-      $n = 1;
-      for ($i = 0; $i < 9; $i++) {
-        ($n == 1) ? $n= 2 : $n = 1;
-        $tmp .= $n * $perNum[$i];
-      }
-      $tmp = str_split($tmp);
-      $sum = array_sum($tmp);
-      $check = (ceil($sum/10)-$sum/10)*10;
-      $ref = $perNum[9];
-//      echo gettype($check)." ".$check." = ".gettype($ref)." ".$ref;
-
-      if ($ref != $check) 
-        form_set_error('field_pno', t('Invalid pno'));
-    }
-    else { 
-      form_set_error('field_pno', t('Invalid pno'));
-    }
-  } */
-
 }
 
 function apartments_user_form_submit_handler($form, &$form_state) {
   $values = empty($form_state['input']) ? $form_state['values'] : $form_state['input'];
+
+  $user_path = variable_get('apartments_path_username', '');
+  list($username, $user_field, $user_profile)  = _apartments_get_data_from_form($values, $user_path, $values['name']);
+
+  $email_path = variable_get('apartments_path_email', '');
+  list($email, $email_field, $email_profile)  = _apartments_get_data_from_form($values, $email_path, $values['mail']);
+
   $register = false;
   if(empty($form_state['#user'])) {
     $register = true;
     $passwd = user_password();
   	$edit = array(
-  		  'name' => $values['name'],
+  		  'name' => $username,
   		  'pass' => $passwd,
-  		  'mail' => $values['mail'],
-  		  'init' => $values['mail'] ? $values['email'] : $values['name'],
+  		  'mail' => $email,
+  		  'init' => $email ? $email : $username,
   		  'status' => 1,
   		  'access' => REQUEST_TIME,
   	);
@@ -231,18 +238,17 @@ function apartments_user_form_submit_handler($form, &$form_state) {
 
     /* if user is anonymous .. then login */
     if(user_is_anonymous()) {
-      
       global $user;
       $user = user_load($u->uid);
-      $login_array = array ('name' => $values['name']);
+      $login_array = array ('name' => $username);
       user_login_finalize($login_array);
     }
   }
   else {
-    $form_state['#user']->mail = $values['mail'];
+    $form_state['#user']->mail = $email;
     $edit = array(
-      'name' => $values['name'],
-      'mail' => $values['mail'],
+      'name' => $username,
+      'mail' => $email,
       'status' => 1,
       'access' => REQUEST_TIME,
     );
@@ -255,16 +261,16 @@ function apartments_user_form_submit_handler($form, &$form_state) {
 	if($u) {
     if($register) {
       if(user_access('administer apartments module'))
-    		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $values['name'], '!passwd' => $passwd)), 'status');	
+    		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $username, '!passwd' => $passwd)), 'status');	
       rules_invoke_event('apartments_user_register', $u, $passwd);
     }
     else {
-      drupal_set_message(t('User with username "!name" has been updated', array('!name' => $values['name'])), 'status');  
+      drupal_set_message(t('User with username "!name" has been updated', array('!name' => $username)), 'status');  
       rules_invoke_event('apartments_user_edit', $u);
     }
 	}
   else {
-    drupal_set_message(t('User with username "!name" could not be saved', array('!name' => $values['name'])), 'error');
+    drupal_set_message(t('User with username "!name" could not be saved', array('!name' => $username)), 'error');
   }
 }
 
@@ -435,6 +441,31 @@ function apartments_field_formatter_view($entity_type, $entity, $field, $instanc
   return $elements;  
 }
 
+
+/**
+* Form function, called by drupal_get_form()
+* in nfportal_menu().
+*/
+function apartments_settings_form($form, &$form_state) {
+    $form['apartments_path_username'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Path to username in profile2'),
+        '#default_value' => variable_get('apartments_path_username', ''),
+        '#description' => t('Enter path (profilename/fieldname) to a field in profiles2 where username is given. If none supplied the user will be prompted to enter a username.'),
+        '#required' => FALSE,
+    );
+    $form['apartments_path_email'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Path to users email in profile2'),
+        '#default_value' => variable_get('apartments_path_email', ''),
+        '#description' => t('Enter path to a field in profiles2 where email is given. If none supplied the user will be prompted to enter an email (not required)'),
+        '#required' => FALSE,
+    );
+    return system_settings_form($form);
+}
+
+
+
 function apartments_fix_function () {
   $q = db_query("select uid from users");
   foreach ($q as $u) {
@@ -472,3 +503,22 @@ function apartments_fix_function () {
   echo $i;
 
 }
+
+function _apartments_get_data_from_form($values, $field_path, $default) {
+  $field = $profile = null;
+  if($field_path) {
+    list($profile, $field) = explode("/", $field_path);
+    $profile = "profile_" . $profile;
+    if(!empty($profile) && !empty($field) && array_key_exists($profile, $values) && array_key_exists($field, $values[$profile])) {
+      $ret = $values[$profile][$field];
+      while(is_array($ret)) //damn ugly way to fetch a field value from an entity...
+        $ret = array_pop($ret);
+    }
+    else 
+      $ret = $default;
+  }
+  else 
+    $ret = $default;
+  return array($ret, $field, $profile);
+}
+
