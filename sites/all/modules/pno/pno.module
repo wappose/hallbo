@@ -71,9 +71,6 @@ function pno_field_widget_form(&$form, &$form_state, $field, $instance, $langcod
       // Then we assign to textf element an array.x
       // With the following values.
       $item =& $items[$delta];
-      if(isset($item['pno'])) 
-        _pno_sanitize_validate_data($item['pno']);
-
       $element['pno'] = array( 
         // Element type 'textfield'.
         '#type' => 'textfield', 
@@ -90,7 +87,11 @@ function pno_field_widget_form(&$form, &$form_state, $field, $instance, $langcod
         '#weight' => isset($element['#weight']) ? $element['#weight'] : 0,
         // Line that we'll need for the output.
         '#delta' => $delta, 
-      );
+        //class
+        '#attributes' => array('class' => array('form-pno-input')),
+        //add js to sanitize pno client side
+        '#attached' => array('js' => array(drupal_get_path('module', 'pno') . '/pno.js')),
+      ); 
     break;
   }
   return $element;
@@ -111,7 +112,19 @@ function pno_field_is_empty($item, $field) {
 function pno_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
     if(strlen($item['pno']) > 0) {
-      if(!_pno_sanitize_validate_data($item['pno'])) {
+      $ok = false;
+      if(preg_match("/^(\d{6})([\-\+])(\d{4})$/", $item['pno'])) {
+        $pno = $item['pno'];
+        $n = 2;
+        for ($i=0; $i<9; $i++) { 
+          $tmp = $pnr[$i] * $n; 
+          ($tmp > 9) ? $sum += 1 + ($tmp % 10) : $sum += $tmp; ($n == 2) ? $n = 1 : $n = 2; 
+        }
+        if(($sum + $pnr[9]) % 10 == 0) 
+          $ok = true;
+      }
+
+      if(!$ok) {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'pno_invalid',
           'message' => t('%title is invalid.',
@@ -150,39 +163,3 @@ function pno_format_field($item) {
   return $element;
 }
 
-function pno_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  if ($field['type'] == 'pno') {
-    foreach ($items as $delta => $item) {
-      if (isset($item['pno'])) {
-        _pno_sanitize_validate_data($item['pno']);
-        $items[$delta]['pno'] = $item['pno'];
-      }
-    }
-  }
-}
-
-function _pno_sanitize_validate_data(&$pno) {
-  $pno = preg_replace("/[^0-9]/", '', $pno); //remove non digits
-  $ok = false;
-  if(strlen($pno) == 10 ) {
-    $yy = substr($pno, 0, 2);
-    $yyyy = date('Y');
-    $cc = substr($yyyy, 0, 2);
-    if(($cc * 1000  + $yy) > $yyyy) 
-      $cc--;
-    $pno = $cc . $pno;
-  }
-  if(strlen($pno) == 12) {
-    $pnr = substr($pno, 2);
-    $n = 2;
-    for ($i=0; $i<9; $i++) { 
-      $tmp = $pnr[$i] * $n; 
-      ($tmp > 9) ? $sum += 1 + ($tmp % 10) : $sum += $tmp; ($n == 2) ? $n = 1 : $n = 2; 
-    }
-    if(($sum + $pnr[9]) % 10 == 0) {
-      $pno = preg_replace("/([0-9]{8})([0-9]{4})/", "$1-$2", $pno);
-      $ok = true;
-    }
-  }
-  return $ok;
-}
