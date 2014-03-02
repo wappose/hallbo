@@ -100,7 +100,7 @@ header#navbar .navbar-nav > .active > a:focus {
   float: right;
 }
 
-.views-exposed-widgets .form-control {
+.views-exposed-widgets .form-checkboxes  {
   background-color: transparent;
   background-image: none;
   border: none;
