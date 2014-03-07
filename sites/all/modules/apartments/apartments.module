@@ -190,13 +190,15 @@ function apartments_user_form_validate_handler($form, &$form_state) {
   list($email, $email_field, $email_profile)  = _apartments_get_data_from_form($values, $email_path, $values['mail']);
 
  	if(empty($form_state['#user'])) {
+    if($error_message = user_validate_name($username))
+      form_set_error($user_field ? $user_field : 'name', $error_message);
     $u = user_load_by_name($username);
   }
-  
+
   //TODO: make form set error mark profile2 fields in case of an error.
 	if($u && $u->uid) 
-		form_set_error($user_field ? $user_field : 'name', t('A user with specified username already exists'));
-	elseif($error_message = user_validate_name($username)) 
+		form_set_error($user_field ? $user_field : 'name', t('User "!name" already exists', array('!name' => $username)));
+	elseif(!empty($form_state['#user']) && $username && $error_message = user_validate_name($username))
 		form_set_error($user_field ? $user_field : 'name', $error_message);
 
   if(!empty($email)) {
@@ -247,11 +249,13 @@ function apartments_user_form_submit_handler($form, &$form_state) {
   else {
     $form_state['#user']->mail = $email;
     $edit = array(
-      'name' => $username,
-      'mail' => $email,
       'status' => 1,
       'access' => REQUEST_TIME,
     );
+    if($username)
+      $edit['name'] = $username;
+    if($email)
+      $edit['mail'] = $email;
     $u = user_save($form_state['#user'], $edit);
   }
   
@@ -261,16 +265,16 @@ function apartments_user_form_submit_handler($form, &$form_state) {
 	if($u) {
     if($register) {
       if(user_access('administer apartments module'))
-    		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $username, '!passwd' => $passwd)), 'status');	
+    		drupal_set_message(t('User with username "!name" and password "!passwd" created', array('!name' => $form_state['#user']->name, '!passwd' => $passwd)), 'status');	
       rules_invoke_event('apartments_user_register', $u, $passwd);
     }
     else {
-      drupal_set_message(t('User with username "!name" has been updated', array('!name' => $username)), 'status');  
+      drupal_set_message(t('User with username "!name" has been updated', array('!name' => $form_state['#user']->name)), 'status');
       rules_invoke_event('apartments_user_edit', $u);
     }
 	}
   else {
-    drupal_set_message(t('User with username "!name" could not be saved', array('!name' => $username)), 'error');
+    drupal_set_message(t('User with username "!name" could not be saved', array('!name' => $form_state['#user']->name)), 'error');
   }
 }
 
