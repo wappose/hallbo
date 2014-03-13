@@ -239,7 +239,8 @@ function apartments_user_form_submit_handler($form, &$form_state) {
     $u = user_save($uu, $edit);
 
     /* if user is anonymous .. then login */
-    if(user_is_anonymous()) {
+    $login_after_registration = variable_get('apartments_login_after_register', false);
+    if(user_is_anonymous() && $login_after_registration) {
       global $user;
       $user = user_load($u->uid);
       $login_array = array ('name' => $username);
@@ -463,6 +464,13 @@ function apartments_settings_form($form, &$form_state) {
         '#title' => t('Path to users email in profile2'),
         '#default_value' => variable_get('apartments_path_email', ''),
         '#description' => t('Enter path to a field in profiles2 where email is given. If none supplied the user will be prompted to enter an email (not required)'),
+        '#required' => FALSE,
+    );
+    $form['apartments_login_after_register'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Login user after registration'),
+        '#default_value' => variable_get('apartments_login_after_register', false),
+        '#description' => t('Check this if you want the user to automatically be logged in after registration.'),
         '#required' => FALSE,
     );
     return system_settings_form($form);
