@@ -100,9 +100,10 @@ function apartments_view_account_page ($user) {
 function apartments_view_profile_page ($account) {
   $apartments_profiles = array();
   $types = profile2_get_types();
+  $hidden_profiles = explode(",", variable_get('apartments_hidden_profiles', ''));
   foreach($types as $type) {
     $type_name = $type->type;
-    if (strpos($type_name, 'apartments') === 0) {
+    if (strpos($type_name, 'apartments') === 0 && ! in_array($type_name, $hidden_profiles))  {
       $profile = profile2_load_by_user($account, $type_name);
       if (empty($profile)) 
         $profile = profile2_create(array('type' => $type_name, 'uid' => $accounts->uid));
@@ -363,10 +364,10 @@ function apartments_permission() {
 function apartments_user_register_access() {
   return (user_is_anonymous() && user_access('apartments create new account')) || user_access('administer apartments');
 }
-function apartments_user_edit_access($uid) {
+function apartments_user_edit_access($account) {
   global $user;
   return (!user_is_anonymous() && 
-          ((user_access('apartments edit own account') && $user->uid == $uid) || user_access('apartments edit any account'))) || 
+          ((user_access('apartments edit own account') && $user->uid == $account->uid) || user_access('apartments edit any account'))) || 
         user_access('administer apartments');
 }
 
@@ -500,6 +501,13 @@ function apartments_settings_form($form, &$form_state) {
         '#description' => t('Enter path to a field in profiles2 where email is given. If none supplied the user will be prompted to enter an email (not required)'),
         '#required' => FALSE,
     );
+    $form['apartments_hidden_profiles'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Hidden apartments profiles on users profile page'),
+        '#default_value' => variable_get('apartments_hidden_profiles', ''),
+        '#description' => t('Enter key-names of all profiles you dont want to show on the users apartments profile page, comma separated'),
+        '#required' => FALSE,
+    );    
     $form['apartments_login_after_register'] = array(
         '#type' => 'checkbox',
         '#title' => t('Login user after registration'),

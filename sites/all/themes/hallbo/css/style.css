@@ -179,3 +179,7 @@ header#navbar .navbar-nav > .active > a:focus {
 .field-name-field-specifics .tabledrag-toggle-weight-wrapper {
   display: none;
 }
+
+input.form-control[type=text] {
+  max-width: 320px;
+}
