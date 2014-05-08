@@ -319,25 +319,39 @@ function apartments_preprocess_page(&$vars, $hook) {
 }
 
 function apartments_views_pre_view(&$view, &$display_id, &$args) {
-  
-/*   $filters = $view->display_handler->get_option('filters');
-   $filters['field_max_room_count_value']['value']['value'] = 4;
-   $filters['field_min_room_count_value']['value']['value'] = 4;
-   $view->display_handler->override_option('filters', $filters);
-   
-   if ($view->name === 'profils_k') {
-	  if (arg(0) == 'node' && is_numeric(arg(1))) {
-		$nid = arg(1);
-		$node = node_load($nid);
-	  }
-	  
-     //  $handler = $view->display['default']->handler;
-   }*/
+
 }
 
 
 function apartments_views_query_alter(&$view, &$query) {
-	
+	if ($view->name === 'apartments_queue' && arg(0) == 'node' && is_numeric(arg(1))) {
+    $current_node = node_load(arg(1));
+    dsm($current_node);
+
+    $filters = $view->display_handler->get_option('filters');
+    dsm($filters);
+    $filters['field_rooms_requested_value']['value'] = 4;
+    $view->display_handler->override_option('filters', $filters);
+
+/*    if (arg(0) == 'node' && is_numeric(arg(1))) {
+    $nid = arg(1);
+    $node = node_load($nid);
+    }*/
+    
+     //  $handler = $view->display['default']->handler;
+  }
+  elseif($view->name == 'apartments_queue_position' && $view->current_display == 'queuepos' && arg(1) == 'user' && is_numeric(arg(2))) {
+    /*Ladda användare och ställ*/
+    $uu = user_load(arg(2));
+    if($uu) {
+      if($p = profile2_load_by_user($uu, 'apartments_search_profile')) {
+        $pwrapper = entity_metadata_wrapper('profile2', $p);
+        $entry_date = $pwrapper->field_entry_date->value();
+        $query->where[1]['conditions'][1] = array( 'field' => 'profile_users__field_data_field_entry_date.field_entry_date_value', 'value' => $entry_date, 'operator' => '<=' ); 
+        dsm($query);
+      }
+    }
+  }
 }
 
 function apartments_permission() {
