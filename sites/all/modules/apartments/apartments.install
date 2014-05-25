@@ -15,3 +15,55 @@ function apartments_uninstall() {
 }
 
 
+/**
+ * Implements hook_schema().
+ */
+function apartments_schema() {
+    $schema['apartments_invites'] = array(
+      'description' => 'Table for invites to apartments.',
+      'fields' => array(
+        'uid' => array(
+          'description' => 'User id',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0),
+        'nid' => array(
+          'description' => 'Apartment node id',
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'default' => 0),
+        'invite_date' => array('description' => 'The Unix timestamp Invoicedate', 
+          'type' => 'int', 
+          'not null' => FALSE, 
+          'default' => null),
+        'visited' => array('description' => 'Indicate if the user has visited the Apartment', 
+          'type' => 'int', 
+          'size' => 'tiny', 
+          'not null' => TRUE, 
+          'default' => 0),
+        'interest' => array('description' => 'User report interest in apartment', 
+          'type' => 'int', 
+          'size' => 'tiny', 
+          'not null' => TRUE, 
+          'default' => 0),
+      ),
+      'indexes' => array(
+        'invite_date' => array('invite_date'),
+      ),
+      'foreign keys' => array(
+        'users' => array(
+          'table' => 'users',
+          'columns' => array('uid' => 'uid'),
+        'node' => array(
+          'table' => 'node',
+          'columns' => array('nid' => 'nid'),
+        ),
+      ),
+      'primary key' => array('uid', 'nid'),
+    ),
+  );
+  return $schema;
+}
+
