@@ -1,0 +1,78 @@
+/* Navigation related CSS */
+
+header#navbar .navbar-nav li {
+    a {
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      padding-top:10px;
+      padding-bottom:10px;
+      background-color: #019a61;
+    }
+    a:hover, a.active-trail, &.active > a, .active > a:hover, &.active > a:focus {
+      background-color: #00784B;
+    }
+    ul {
+        margin-top: 0;
+        padding-top: 0;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        li a {
+            border-bottom: 1px solid white;
+            @include mobile() {
+                border-bottom: 0px solid white;
+            }
+        }
+    }
+}
+
+header#navbar {
+  background-color: transparent;
+  border: 0;
+}
+header#navbar .navbar-collapse {
+  background-color: #019a61;
+}
+
+header#navbar .navbar-nav > li {
+  border-right: 1px solid white;
+  @include mobile() {
+    border-right: 0px solid white;
+  }
+}
+header#navbar ul.navbar-nav {
+  border-left: 1px solid white;
+  @include mobile() {
+    border-left: 0;
+  }
+}
+
+
+//LEFTY
+.region-sidebar-first .block-menu-block {
+    h2 {
+        margin-top: 0;
+        a {
+            background-color: #019a61;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding:10px 15px;
+            display:block;
+        }
+    }
+
+    @include mobile() {
+        display: none;
+    }
+}
+
+header#navbar .block-menu-block ul.menu {
+    @extend .navbar-nav
+}
+
+
+header#navbar .block-menu-block ul.menu .open .dropdown-menu > li > a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}

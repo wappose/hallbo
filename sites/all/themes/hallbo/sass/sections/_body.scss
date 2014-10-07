@@ -1,0 +1,24 @@
+
+h1.page-header {
+    margin-top: 0;
+    border-bottom: 0;
+}
+
+.table-cell-style {
+    padding: 5px;
+    border-bottom: 1px solid grey;
+}
+.region-content .content {
+    table {
+        tr {
+            th {
+                @extend .table-cell-style;
+                background-color: #84B6ED;
+            }
+            td {
+                @extend .table-cell-style;
+            }
+        }
+    }
+
+}

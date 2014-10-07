@@ -1,0 +1,92 @@
+
+
+
+
+
+#block-block-1 {
+  float: right;
+}
+
+.views-exposed-widgets .form-checkboxes  {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  border-radius: none;
+  box-shadow: none;
+  color: inherit;
+  display: inherit;
+  font-size: inherit;
+  height: auto;
+  line-height: inherit;
+  padding: 0;
+  transition: none; ;
+  vertical-align: middle;
+  width: auto;
+}
+.views-exposed-widgets input.form-control {
+  display: inline;
+}
+
+.views-exposed-widgets ul {
+  margin-left: 0;
+  padding-left: 0;
+  list-style-type:none;
+}
+.views-exposed-widgets ul ul {
+  margin-left: 0;
+  padding-left: 15px;
+}
+.views-exposed-widgets label.option {
+  line-height: 20px;
+  font-weight: normal;
+}
+
+#apartments-user-register-form .form-checkbox {
+  max-width: inherit;
+}
+
+.view-apartments-queue fieldset.form-wrapper {
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+.view-apartments-queue legend.panel-heading {
+  display: none;
+}
+.view-apartments-queue .panel-body {
+  padding: 0;
+  margin: 0;
+}
+
+#block-block-1, #block-block-2 { float: right; padding-right: 20px; }
+
+#views-exposed-form-apartments-queue-page #edit-field-rooms-requested-value-wrapper .bef-checkboxes .form-type-bef-checkbox {
+  float: left;
+  padding-right: 10px;
+}
+
+
+.field-name-field-rooms-requested .form-type-checkbox,
+.field-name-field-apartments-options .form-type-checkbox,
+.field-name-field-apartments-objects .form-type-checkbox {
+  float: left;
+  padding-right: 10px;
+}
+.field-name-field-rooms-requested .form-checkboxes,
+.field-name-field-apartments-options .form-checkboxes,
+.field-name-field-apartments-objects  .form-checkboxes {
+  overflow:hidden;
+}
+.field-name-field-rooms-requested .checkbox+.checkbox,
+.field-name-field-apartments-options .checkbox+.checkbox,
+.field-name-field-apartments-objects .checkbox+.checkbox {
+  margin-top: 0px;
+}
+
+.field-name-field-specifics .tabledrag-toggle-weight-wrapper {
+  display: none;
+}
+
+input.form-control[type=text] {
+  max-width: 320px;
+}
