@@ -1,44 +1,44 @@
 <?php
 /**
-* Credits to the following pages: 
+* Credits to the following pages:
 * Stubs from this page
 * http://internetdevels.com/blog/module-with-field-api-drupal-7
 * Glue and paint from this page
 * http://evolvingweb.ca/story/poutine-maker-introduction-field-api-drupal-7-part-1
 * Happy reading.
 */
-function pno_field_info() { 
+function pno_field_info() {
   // Returning array.
-  return array( 
+  return array(
     // Which is called pno.
-    'pno' => array( 
+    'pno' => array(
       // Name of our type will be 'Te(x/s)t field'.
-      'label' => t('Person number field'), 
+      'label' => t('Person number field'),
       // Description of our type.
-      'description' => t('A simple text field with person number validation'), 
+      'description' => t('A simple text field with person number validation'),
       // Standart widget that will be dispalyed at once.
       // after that we choose field type
-      'default_widget' => 'pno_widget',                       
+      'default_widget' => 'pno_widget',
       // Standart that will be dispayed right after we choose field type.
-      'default_formatter' => 'pno_formatter', 
+      'default_formatter' => 'pno_formatter',
       // we add the propert type here to describe the property for the entity api
-      'property_type' => 'text', 
+      'property_type' => 'text',
     ),
   );
 }
-   
+
 /**
  * Implements hook_field_widget_info().
  */
-function pno_field_widget_info() { 
+function pno_field_widget_info() {
   // Returning massive.
-  return array(  
+  return array(
     // With pno name.
-    'pno_widget' => array( 
+    'pno_widget' => array(
       // Our widget will be named pno label.
-      'label' => t('Person number'), 
+      'label' => t('Person number'),
       // Our widget will work with a field in DB under the name pno.
-      'field types' => array('pno'), 
+      'field types' => array('pno'),
     ),
   );
 }
@@ -46,15 +46,15 @@ function pno_field_widget_info() {
 /**
  * Implements hook_field_formatter_info().
  */
-function pno_field_formatter_info() { 
+function pno_field_formatter_info() {
   // Returning array.
-  return array(  
+  return array(
     // Name of our format for code.
-    'pno_formatter' => array( 
+    'pno_formatter' => array(
       // Dispalyed name of format.
-      'label' => t('Pno text field formatter'), 
+      'label' => t('Pno text field formatter'),
       // Field in DB with which our format will work.
-      'field types' => array('pno'), 
+      'field types' => array('pno'),
     ),
   );
 }
@@ -65,33 +65,33 @@ function pno_field_formatter_info() {
 function pno_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   // Setting switch into parameters that wll work widget types that are in module.
   //dsm($instance);
-  switch ($instance['widget']['type']) { 
+  switch ($instance['widget']['type']) {
     // If parameter case is 'textf'.
-    case 'pno_widget': 
+    case 'pno_widget':
       // Then we assign to textf element an array.x
       // With the following values.
       $item =& $items[$delta];
-      $element['pno'] = array( 
+      $element['pno'] = array(
         // Element type 'textfield'.
-        '#type' => 'textfield', 
+        '#type' => 'textfield',
         // Heading given in element settings.
-        '#title' => $element['#title'], 
+        '#title' => $element['#title'],
         // Widget description is given in element settings.
         '#description' => $element['#description'],
         // Our widget will have standart value textfield.
         '#default_value' => isset($item['pno']) ? $item['pno'] : '',
         // If element is required it will be indicated in settings of the very element.
-        '#required' => $element['#required'], 
-        // Element location – 
+        '#required' => $element['#required'],
+        // Element location –
         // If it's indicated, value should be used, if not, value is 0.
         '#weight' => isset($element['#weight']) ? $element['#weight'] : 0,
         // Line that we'll need for the output.
-        '#delta' => $delta, 
+        '#delta' => $delta,
         //class
         '#attributes' => array('class' => array('form-pno-input')),
         //add js to sanitize pno client side
         '#attached' => array('js' => array(drupal_get_path('module', 'pno') . '/pno.js')),
-      ); 
+      );
     break;
   }
   return $element;
@@ -104,7 +104,7 @@ function pno_field_is_empty($item, $field) {
   // If there's nothing in $item['textf'].
   if (empty($item['pno'])) {
     // Then we return 1, i.e. we say to Drupal that everything is fine).
-    return TRUE; 
+    return TRUE;
     // And if it's empty, nothing will be displayed.
   }
 }
@@ -114,13 +114,13 @@ function pno_field_validate($entity_type, $entity, $field, $instance, $langcode,
     if(strlen($item['pno']) > 0) {
       $ok = false;
       if(preg_match("/^(\d{6})([\-\+])(\d{4})$/", $item['pno'])) {
-        $pno = $item['pno'];
+        $pnr = $item['pno'];
         $n = 2;
-        for ($i=0; $i<9; $i++) { 
-          $tmp = $pnr[$i] * $n; 
-          ($tmp > 9) ? $sum += 1 + ($tmp % 10) : $sum += $tmp; ($n == 2) ? $n = 1 : $n = 2; 
+        for ($i=0; $i<9; $i++) {
+          $tmp = $pnr[$i] * $n;
+          ($tmp > 9) ? $sum += 1 + ($tmp % 10) : $sum += $tmp; ($n == 2) ? $n = 1 : $n = 2;
         }
-        if(($sum + $pnr[9]) % 10 == 0) 
+        if(($sum + $pnr[9]) % 10 == 0)
           $ok = true;
       }
 
