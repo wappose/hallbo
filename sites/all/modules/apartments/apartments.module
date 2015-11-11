@@ -53,6 +53,7 @@ function apartments_menu() {
     'page arguments' => array(2),
     'access arguments' => array(2),
     'access callback' =>'apartments_user_edit_access',
+    'type' => MENU_NORMAL_ITEM,
   );
   $items['apartments/user/%user/open'] = array(
     'title' => t('Visa användare'),
